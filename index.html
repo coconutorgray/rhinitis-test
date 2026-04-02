@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비염 유형 테스트</title>
+
+<style>
+  body {
+    font-family: sans-serif;
+    text-align: center;
+    padding: 20px;
+  }
+  .card {
+    margin: 20px auto;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    max-width: 400px;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>🌿 비염 유형 테스트</h2>
+
+<form id="testForm">
+
+<div class="card">
+<p>1. 아침에 코막힘이 심하다</p>
+<input type="radio" name="q1" value="A"> 그렇다<br>
+<input type="radio" name="q1" value="B"> 아니다
+</div>
+
+<div class="card">
+<p>2. 환기를 자주 하지 않는다</p>
+<input type="radio" name="q2" value="B"> 그렇다<br>
+<input type="radio" name="q2" value="A"> 아니다
+</div>
+
+<div class="card">
+<p>3. 외출 후 세안을 잘 안 한다</p>
+<input type="radio" name="q3" value="A"> 그렇다<br>
+<input type="radio" name="q3" value="B"> 아니다
+</div>
+
+<button type="button" onclick="calculateResult()">결과 보기</button>
+
+</form>
+
+<h3 id="result"></h3>
+
+<script>
+function calculateResult() {
+  let form = document.forms["testForm"];
+  let scoreA = 0;
+  let scoreB = 0;
+
+  let answers = {};
+
+  for (let i = 1; i <= 3; i++) {
+    let q = form["q" + i];
+    let answered = false;
+
+    for (let j = 0; j < q.length; j++) {
+      if (q[j].checked) {
+        answers["q" + i] = q[j].value;
+        answered = true;
+
+        if (q[j].value === "A") scoreA++;
+        else scoreB++;
+      }
+    }
+
+    if (!answered) {
+      alert(i + "번 질문을 선택해주세요!");
+      return;
+    }
+  }
+
+  let resultText = "";
+  let resultType = "";
+
+  if (scoreA > scoreB) {
+    resultType = "자연민감형";
+    resultText = "🌿 자연민감형\n꽃가루와 야외 환경에 민감해요!\n→ 외출 후 세안 꼭 하기";
+  } else {
+    resultType = "실내먼지형";
+    resultText = "🏠 실내먼지형\n환기와 청소가 중요해요!\n→ 하루 10분 환기하기";
+  }
+
+  document.getElementById("result").innerText = resultText;
+
+  // 🔥 여기 중요: 구글 시트로 전송
+  sendData({
+    q1: answers.q1,
+    q2: answers.q2,
+    q3: answers.q3,
+    result: resultType
+  });
+}
+
+// 👉 여기 URL 바꿔야 함
+function sendData(data) {
+  fetch("https://script.google.com/macros/s/AKfycbwoOC6RIQaW0_F0B9kKcwqsxmQDR2C75_OConFnghBDbeMK8PskPXUHNsW_j55amnt49w/exec", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => console.log("저장 완료"))
+  .catch(err => console.log("에러:", err));
+}
+</script>
+
+</body>
+</html>
